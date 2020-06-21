@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.expressAuthentication = void 0;
 var tslib_1 = require("tslib");
 var jwt = tslib_1.__importStar(require("jsonwebtoken"));
 var config_1 = tslib_1.__importDefault(require("./env/config"));

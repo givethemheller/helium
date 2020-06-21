@@ -13,6 +13,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ApiError = void 0;
 var ApiError = /** @class */ (function (_super) {
     __extends(ApiError, _super);
     function ApiError(name, status, message) {

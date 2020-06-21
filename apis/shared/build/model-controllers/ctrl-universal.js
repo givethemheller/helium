@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.deletDoc = exports.updateDoc = exports.createDoc = exports.findMany = exports.findOneById = exports.findOne = void 0;
 var baseInterfaces_1 = require("../baseInterfaces");
 var abilities_1 = require("../abilities");
 var mongoose_1 = require("@casl/mongoose");
@@ -14,7 +15,7 @@ function findOne(model, conditions, id, projection, user) {
         // projection || model.permittedFieldsBy(defineAbilityFor(user));
         if (id) {
             return model
-                .findOne({ _id: id }, permissionProjection)
+                .findById(id, permissionProjection)
                 .lean()
                 .exec();
         }
@@ -63,7 +64,7 @@ function findMany(model, conditions, sort, paginate, projection, user) {
         if (sort) {
             baseFind.sort(sort);
         }
-        return baseFind.lean().exec(); // as unknown as Promise<R[] | null>;
+        return baseFind.lean().exec();
     }
 }
 exports.findMany = findMany;

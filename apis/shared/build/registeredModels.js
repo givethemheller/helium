@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.registeredModels = void 0;
 var models_1 = require("./models");
 exports.registeredModels = [
     {

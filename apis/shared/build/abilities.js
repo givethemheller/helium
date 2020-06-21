@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.defineAbilityFor = void 0;
 var ability_1 = require("@casl/ability");
 function defineAbilityFor(user) {
     var _a = new ability_1.AbilityBuilder(), can = _a.can, rules = _a.rules;

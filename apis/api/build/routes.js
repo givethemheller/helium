@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.RegisterRoutes = void 0;
 var tslib_1 = require("tslib");
 /* tslint:disable */
 /* eslint-disable */

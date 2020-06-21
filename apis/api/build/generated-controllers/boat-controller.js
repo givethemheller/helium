@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.boatController = void 0;
 var tslib_1 = require("tslib");
 var tsoa_1 = require("tsoa");
 var api_shared_1 = require("@helium/api-shared");

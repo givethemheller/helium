@@ -14,6 +14,6 @@ export declare function findOne<D, R>(model: Model<D & Document, {}>, conditions
 export declare function findOneById<D, R>(model: Model<D & Document, {}>, id?: string | false, projection?: string, user?: User): Promise<R | null>;
 export declare function findMany<D, R>(model: Model<D & Document, {}>, conditions?: Array<ArgsFromType<D>> | false, sort?: Array<SortFromType<D>> | false, paginate?: Pagination | false, projection?: string, user?: User): Promise<R[] | null>;
 export declare function createDoc<D, R>(model: Model<D & Document, {}>, documents: ArgsFromType<D>, user: User): Promise<R>;
-export declare function updateDoc<D, R>(model: Model<D & Document, {}>, id: string, updates: Array<ArgsFromType<D>>, user: User, projection?: string): Promise<R>;
+export declare function updateDoc<D, R>(model: Model<D & Document, {}>, id: string, updates: ArgsFromType<D>, user: User, projection?: string): Promise<R>;
 export declare function deletDoc<D, R>(model: Model<D & Document, {}>, id: string, user: User): Promise<any>;
 export {};

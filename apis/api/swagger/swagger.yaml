@@ -558,8 +558,7 @@ paths:
                     application/json:
                         schema:
                             properties:
-                                conditions:
-                                    additionalProperties: true
+                                conditions: {}
                             required:
                                 - conditions
                             type: object
@@ -736,8 +735,7 @@ paths:
                     application/json:
                         schema:
                             properties:
-                                conditions:
-                                    additionalProperties: true
+                                conditions: {}
                             required:
                                 - conditions
                             type: object
@@ -914,8 +912,7 @@ paths:
                     application/json:
                         schema:
                             properties:
-                                conditions:
-                                    additionalProperties: true
+                                conditions: {}
                             required:
                                 - conditions
                             type: object
@@ -1092,8 +1089,7 @@ paths:
                     application/json:
                         schema:
                             properties:
-                                conditions:
-                                    additionalProperties: true
+                                conditions: {}
                             required:
                                 - conditions
                             type: object
@@ -1270,8 +1266,7 @@ paths:
                     application/json:
                         schema:
                             properties:
-                                conditions:
-                                    additionalProperties: true
+                                conditions: {}
                             required:
                                 - conditions
                             type: object
@@ -1448,8 +1443,7 @@ paths:
                     application/json:
                         schema:
                             properties:
-                                conditions:
-                                    additionalProperties: true
+                                conditions: {}
                             required:
                                 - conditions
                             type: object

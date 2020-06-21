@@ -13,7 +13,7 @@
 import { RequestFile } from '../api';
 
 export class InlineObject5 {
-    'conditions': { [key: string]: object; };
+    'conditions': object;
 
     static discriminator: string | undefined = undefined;
 
@@ -21,7 +21,7 @@ export class InlineObject5 {
         {
             "name": "conditions",
             "baseName": "conditions",
-            "type": "{ [key: string]: object; }"
+            "type": "object"
         }    ];
 
     static getAttributeTypeMap() {

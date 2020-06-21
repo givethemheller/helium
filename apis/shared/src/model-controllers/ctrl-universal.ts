@@ -39,15 +39,15 @@ export function findOne<D, R>(
     // projection || model.permittedFieldsBy(defineAbilityFor(user));
     if (id) {
       return model
-        .findOne({ _id: id }, permissionProjection)
+        .findById(id, permissionProjection)
         .lean()
-        .exec();
+        .exec() as unknown as Promise<R | null>;
     } else {
       const baseFind = model.findOne({}, projection);
       if (conditions) {
         baseFind.elemMatch(conditions);
       }
-      return baseFind.lean().exec();
+      return baseFind.lean().exec() as unknown as Promise<R | null>;
     }
   }
 }
@@ -66,7 +66,7 @@ export function findOneById<D, R>(
     return model
       .findById(id, permissionProjection)
       .lean()
-      .exec();
+      .exec() as unknown as Promise<R | null>;
   }
 }
 
@@ -97,7 +97,7 @@ export function findMany<D, R>(
     if (sort) {
       baseFind.sort(sort);
     }
-    return baseFind.lean().exec(); // as unknown as Promise<R[] | null>;
+    return baseFind.lean().exec() as unknown as Promise<R[] | null>;
   }
 }
 
@@ -139,7 +139,7 @@ export function createDoc<D, R>(
 export function updateDoc<D, R>(
   model: Model<D & Document, {}>,
   id: string,
-  updates: Array<ArgsFromType<D>>,
+  updates: ArgsFromType<D>,
   user: User,
   projection?: string
 ): Promise<R> {
@@ -147,14 +147,14 @@ export function updateDoc<D, R>(
   if (accessCheck === null) {
     throw new Error(`you do not have permission to manage ${model.name}`);
   } else {
-    const updateQuery = model.findByIdAndUpdate(id, updates, {
+    const updateQuery = model.findByIdAndUpdate(id, updates as any, {
       new: true
     });
     const permissionProjection = {};
     // projection || model.permittedFieldsBy(defineAbilityFor(user));
     updateQuery.setOptions({ new: true, projection: permissionProjection });
 
-    return updateQuery.lean().exec();
+    return updateQuery.lean().exec() as unknown as Promise<R>;
   }
 }
 

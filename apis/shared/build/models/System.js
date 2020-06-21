@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.system = void 0;
 var mongoose_1 = require("mongoose");
 // tslint:disable-next-line: no-implicit-dependencies
 // tslint:disable-next-line: no-var-requires

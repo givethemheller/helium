@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.clearTestDb = void 0;
 var tslib_1 = require("tslib");
 var mongoose_1 = tslib_1.__importDefault(require("mongoose"));
 var config_1 = tslib_1.__importDefault(require("./env/config"));
