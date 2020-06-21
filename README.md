@@ -1,5 +1,5 @@
 # helium
-Typescript Open Api generated API Mono Repo with Shared object definition library, generated Open Api SDKs and react/react-native app.
+Typescript Open Api generated API (TSOA https://github.com/lukeautry/tsoa) Mono Repo with Shared object definition library, generated Open Api SDKs and react/react-native app.
 
 ## What I This For
 I want to be able to use this package to spin up new applications and projects at high speed. This particular repo is a project tracker for my boat. Side note, I am transitioning to living on a big ol sail boat. Wish me luck!
