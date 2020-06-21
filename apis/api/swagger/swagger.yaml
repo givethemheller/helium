@@ -1,0 +1,1551 @@
+components:
+    examples: {}
+    headers: {}
+    parameters: {}
+    requestBodies: {}
+    responses: {}
+    schemas:
+        System:
+            properties:
+                _id:
+                    type: string
+                referencedParts:
+                    items:
+                        type: string
+                    type: array
+                description:
+                    type: string
+                    description: 'A full description of the system'
+                summary:
+                    type: string
+                    description: 'Short summary of the system'
+                name:
+                    type: string
+                    description: 'The name of the system'
+            required:
+                - _id
+                - referencedParts
+                - description
+                - summary
+                - name
+            type: object
+        Part:
+            properties:
+                _id:
+                    type: string
+                system:
+                    items:
+                        type: string
+                    type: array
+                    description: 'Systems the part can be used in'
+                name:
+                    type: string
+                    description: 'The name of the part'
+            required:
+                - _id
+                - system
+                - name
+            type: object
+        Boat:
+            properties:
+                _id:
+                    type: string
+                hardware:
+                    items:
+                        properties:
+                            parts:
+                                items:
+                                    $ref: '#/components/schemas/Part'
+                                type: array
+                            systems:
+                                items:
+                                    $ref: '#/components/schemas/System'
+                                type: array
+                        type: object
+                    type: array
+                dimensionData:
+                    properties:
+                        LP:
+                            type: number
+                            format: double
+                            description: 'Shortest distance from headstay to the clew of the jib'
+                        E:
+                            type: number
+                            format: double
+                            description: 'Foot length of the mainsail'
+                        P:
+                            type: number
+                            format: double
+                            description: 'Luff length of the mainsail'
+                        J2:
+                            type: number
+                            format: double
+                            description: 'Base of staysail triangle'
+                        J:
+                            type: number
+                            format: double
+                            description: 'Base of the foretriangle measured from the front of the mast to the intersection of the forestay and deck'
+                        I2:
+                            type: number
+                            format: double
+                            description: 'Height of staysail halyard above deck'
+                        I:
+                            type: number
+                            format: double
+                            description: 'Height of the foretriangle measured from the top of the highest sheave to the sheerline'
+                        BWL:
+                            type: number
+                            format: double
+                            description: 'Beam Waterline - widest beam of boat at the waterline'
+                        BMX:
+                            type: number
+                            format: double
+                            description: 'Beam Maximum - width of the boat at the widest point'
+                        DWL:
+                            type: number
+                            format: double
+                            description: 'Design Waterline -theoretical waterline length of boat as opposed to LWL, which is actual waterline length'
+                        LWL:
+                            type: number
+                            format: double
+                            description: 'Length Waterline - length of waterline of the boat'
+                        LOA:
+                            type: number
+                            format: double
+                            description: 'Length Overall - overall tip-to-tip length of the boat'
+                    required:
+                        - LP
+                        - E
+                        - P
+                        - J2
+                        - J
+                        - I2
+                        - I
+                        - BWL
+                        - BMX
+                        - DWL
+                        - LWL
+                        - LOA
+                    type: object
+                model:
+                    type: string
+                    description: 'The model of the boat'
+                brand:
+                    type: string
+                    description: 'The brand of the boat'
+                owner:
+                    type: string
+            required:
+                - _id
+                - model
+                - brand
+                - owner
+            type: object
+        Pick_Boat.Exclude_keyofBoat._id:
+            properties:
+                owner:
+                    type: string
+                brand:
+                    type: string
+                    description: 'The brand of the boat'
+                model:
+                    type: string
+                    description: 'The model of the boat'
+                dimensionData:
+                    properties:
+                        LP:
+                            type: number
+                            format: double
+                            description: 'Shortest distance from headstay to the clew of the jib'
+                        E:
+                            type: number
+                            format: double
+                            description: 'Foot length of the mainsail'
+                        P:
+                            type: number
+                            format: double
+                            description: 'Luff length of the mainsail'
+                        J2:
+                            type: number
+                            format: double
+                            description: 'Base of staysail triangle'
+                        J:
+                            type: number
+                            format: double
+                            description: 'Base of the foretriangle measured from the front of the mast to the intersection of the forestay and deck'
+                        I2:
+                            type: number
+                            format: double
+                            description: 'Height of staysail halyard above deck'
+                        I:
+                            type: number
+                            format: double
+                            description: 'Height of the foretriangle measured from the top of the highest sheave to the sheerline'
+                        BWL:
+                            type: number
+                            format: double
+                            description: 'Beam Waterline - widest beam of boat at the waterline'
+                        BMX:
+                            type: number
+                            format: double
+                            description: 'Beam Maximum - width of the boat at the widest point'
+                        DWL:
+                            type: number
+                            format: double
+                            description: 'Design Waterline -theoretical waterline length of boat as opposed to LWL, which is actual waterline length'
+                        LWL:
+                            type: number
+                            format: double
+                            description: 'Length Waterline - length of waterline of the boat'
+                        LOA:
+                            type: number
+                            format: double
+                            description: 'Length Overall - overall tip-to-tip length of the boat'
+                    required:
+                        - LP
+                        - E
+                        - P
+                        - J2
+                        - J
+                        - I2
+                        - I
+                        - BWL
+                        - BMX
+                        - DWL
+                        - LWL
+                        - LOA
+                    type: object
+                hardware:
+                    items:
+                        properties:
+                            parts:
+                                items:
+                                    $ref: '#/components/schemas/Part'
+                                type: array
+                            systems:
+                                items:
+                                    $ref: '#/components/schemas/System'
+                                type: array
+                        type: object
+                    type: array
+            required:
+                - owner
+                - brand
+                - model
+            type: object
+            description: 'From T, pick a set of properties whose keys are in the union K'
+        OmitOverride_Boat._id_:
+            $ref: '#/components/schemas/Pick_Boat.Exclude_keyofBoat._id'
+        BoatCreate:
+            $ref: '#/components/schemas/OmitOverride_Boat._id_'
+        Pick_Part.Exclude_keyofPart._id:
+            properties:
+                name:
+                    type: string
+                    description: 'The name of the part'
+                system:
+                    items:
+                        type: string
+                    type: array
+                    description: 'Systems the part can be used in'
+            required:
+                - name
+                - system
+            type: object
+            description: 'From T, pick a set of properties whose keys are in the union K'
+        OmitOverride_Part._id_:
+            $ref: '#/components/schemas/Pick_Part.Exclude_keyofPart._id'
+        PartCreate:
+            $ref: '#/components/schemas/OmitOverride_Part._id_'
+        Service:
+            properties:
+                _id:
+                    type: string
+                newParts:
+                    items:
+                        type: string
+                    type: array
+                partsServiced:
+                    items:
+                        type: string
+                    type: array
+                    description: 'parts being affected by the service'
+                systems:
+                    items:
+                        type: string
+                    type: array
+                    description: 'Systems the Service is affecting'
+                steps:
+                    items:
+                        type: string
+                    type: array
+                description:
+                    type: string
+                    description: 'Description of the service'
+                name:
+                    type: string
+                    description: 'The name of the Service'
+            required:
+                - _id
+                - newParts
+                - partsServiced
+                - systems
+                - steps
+                - description
+                - name
+            type: object
+        Pick_Service.Exclude_keyofService._id:
+            properties:
+                name:
+                    type: string
+                    description: 'The name of the Service'
+                description:
+                    type: string
+                    description: 'Description of the service'
+                steps:
+                    items:
+                        type: string
+                    type: array
+                systems:
+                    items:
+                        type: string
+                    type: array
+                    description: 'Systems the Service is affecting'
+                partsServiced:
+                    items:
+                        type: string
+                    type: array
+                    description: 'parts being affected by the service'
+                newParts:
+                    items:
+                        type: string
+                    type: array
+            required:
+                - name
+                - description
+                - steps
+                - systems
+                - partsServiced
+                - newParts
+            type: object
+            description: 'From T, pick a set of properties whose keys are in the union K'
+        OmitOverride_Service._id_:
+            $ref: '#/components/schemas/Pick_Service.Exclude_keyofService._id'
+        ServiceCreate:
+            $ref: '#/components/schemas/OmitOverride_Service._id_'
+        Pick_System.Exclude_keyofSystem._id:
+            properties:
+                name:
+                    type: string
+                    description: 'The name of the system'
+                description:
+                    type: string
+                    description: 'A full description of the system'
+                summary:
+                    type: string
+                    description: 'Short summary of the system'
+                referencedParts:
+                    items:
+                        type: string
+                    type: array
+            required:
+                - name
+                - description
+                - summary
+                - referencedParts
+            type: object
+            description: 'From T, pick a set of properties whose keys are in the union K'
+        OmitOverride_System._id_:
+            $ref: '#/components/schemas/Pick_System.Exclude_keyofSystem._id'
+        SystemCreate:
+            $ref: '#/components/schemas/OmitOverride_System._id_'
+        Tool:
+            properties:
+                _id:
+                    type: string
+                description:
+                    type: string
+                    description: 'description of the Tool'
+                name:
+                    type: string
+                    description: 'The name of the Tool'
+            required:
+                - _id
+                - description
+                - name
+            type: object
+        Pick_Tool.Exclude_keyofTool._id:
+            properties:
+                name:
+                    type: string
+                    description: 'The name of the Tool'
+                description:
+                    type: string
+                    description: 'description of the Tool'
+            required:
+                - name
+                - description
+            type: object
+            description: 'From T, pick a set of properties whose keys are in the union K'
+        OmitOverride_Tool._id_:
+            $ref: '#/components/schemas/Pick_Tool.Exclude_keyofTool._id'
+        ToolCreate:
+            $ref: '#/components/schemas/OmitOverride_Tool._id_'
+        GROUPS:
+            enum:
+                - admin
+                - user
+                - owner
+                - unathenticated
+            type: string
+        User:
+            properties:
+                _id:
+                    type: string
+                    description: 'The users mongodb id'
+                phoneValidationCode:
+                    type: string
+                    description: 'Code texted to the user to validate their phone number'
+                phone:
+                    type: number
+                    format: double
+                    description: "the phone number of the user that can be used for phone based\r\nauthentication"
+                password:
+                    type: string
+                    description: 'The users password, encrypted'
+                email:
+                    type: string
+                    description: 'Email for the user'
+                currentToken:
+                    type: string
+                    description: 'Current token for the user'
+                googleProvider:
+                    properties:
+                        token:
+                            type: string
+                        id:
+                            type: string
+                    required:
+                        - token
+                        - id
+                    type: object
+                    description: 'data from Google for google SSO'
+                sessionStartDate:
+                    type: string
+                    format: date-time
+                    description: 'The date and time that the users session began'
+                passwordResetExpires:
+                    type: string
+                    format: date-time
+                    description: 'date at which the password hash is no longer valid for resetting'
+                passwordResetHash:
+                    type: string
+                    description: 'password reset hash that the user can use to reset their password'
+                userPermissions:
+                    items:
+                        $ref: '#/components/schemas/GROUPS'
+                    type: array
+                    description: 'Permission level of the user'
+            required:
+                - _id
+                - userPermissions
+            type: object
+        Pick_User.email-or-phone-or-password_:
+            properties:
+                email:
+                    type: string
+                    description: 'Email for the user'
+                phone:
+                    type: number
+                    format: double
+                    description: "the phone number of the user that can be used for phone based\r\nauthentication"
+                password:
+                    type: string
+                    description: 'The users password, encrypted'
+            type: object
+            description: 'From T, pick a set of properties whose keys are in the union K'
+        UserCreate:
+            $ref: '#/components/schemas/Pick_User.email-or-phone-or-password_'
+    securitySchemes:
+        jwt:
+            type: apiKey
+            name: authorization
+            in: header
+info:
+    title: '@helium/ts-tsoa-api'
+    version: 0.0.2
+    description: 'Helium API with TSOA generator and openAPI sdk generator'
+    contact: {}
+openapi: 3.0.0
+paths:
+    /boat/find/all:
+        post:
+            operationId: AdminFindboat
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/Boat'
+                                type: array
+            tags:
+                - boat
+            security:
+                -
+                    jwt:
+                        - admin
+            parameters:
+                -
+                    description: 'the page that is returned'
+                    in: header
+                    name: page
+                    required: false
+                    schema:
+                        default: 1
+                        format: int32
+                        type: integer
+                -
+                    description: 'the number of records in the page'
+                    in: header
+                    name: count
+                    required: false
+                    schema:
+                        default: 10
+                        format: int32
+                        type: integer
+    /boat/find:
+        post:
+            operationId: Findboats
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/Boat'
+                                type: array
+            tags:
+                - boat
+            security:
+                -
+                    jwt:
+                        - admin
+            parameters:
+                -
+                    description: 'page needs description'
+                    in: header
+                    name: page
+                    required: false
+                    schema:
+                        default: 0
+                        format: int32
+                        type: integer
+                -
+                    description: 'count needs description'
+                    in: header
+                    name: count
+                    required: false
+                    schema:
+                        default: 20
+                        format: int32
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                conditions:
+                                    additionalProperties: true
+                            required:
+                                - conditions
+                            type: object
+    '/boat/{boatId}':
+        get:
+            operationId: Getboat
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Boat'
+            tags:
+                - boat
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: boatId
+                    required: true
+                    schema:
+                        type: string
+        put:
+            operationId: Updateboat
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Boat'
+            tags:
+                - boat
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: boatId
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/BoatCreate'
+        delete:
+            operationId: Deleteboat
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                type: boolean
+            tags:
+                - boat
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: boatId
+                    required: true
+                    schema:
+                        type: string
+    /boat:
+        post:
+            operationId: Createboat
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Boat'
+            tags:
+                - boat
+            security: []
+            parameters: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/BoatCreate'
+    /part/find/all:
+        post:
+            operationId: AdminFindpart
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/Part'
+                                type: array
+            tags:
+                - part
+            security:
+                -
+                    jwt:
+                        - admin
+            parameters:
+                -
+                    description: 'the page that is returned'
+                    in: header
+                    name: page
+                    required: false
+                    schema:
+                        default: 1
+                        format: int32
+                        type: integer
+                -
+                    description: 'the number of records in the page'
+                    in: header
+                    name: count
+                    required: false
+                    schema:
+                        default: 10
+                        format: int32
+                        type: integer
+    /part/find:
+        post:
+            operationId: Findparts
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/Part'
+                                type: array
+            tags:
+                - part
+            security:
+                -
+                    jwt:
+                        - admin
+            parameters:
+                -
+                    description: 'page needs description'
+                    in: header
+                    name: page
+                    required: false
+                    schema:
+                        default: 0
+                        format: int32
+                        type: integer
+                -
+                    description: 'count needs description'
+                    in: header
+                    name: count
+                    required: false
+                    schema:
+                        default: 20
+                        format: int32
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                conditions:
+                                    additionalProperties: true
+                            required:
+                                - conditions
+                            type: object
+    '/part/{partId}':
+        get:
+            operationId: Getpart
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Part'
+            tags:
+                - part
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: partId
+                    required: true
+                    schema:
+                        type: string
+        put:
+            operationId: Updatepart
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Part'
+            tags:
+                - part
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: partId
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PartCreate'
+        delete:
+            operationId: Deletepart
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                type: boolean
+            tags:
+                - part
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: partId
+                    required: true
+                    schema:
+                        type: string
+    /part:
+        post:
+            operationId: Createpart
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Part'
+            tags:
+                - part
+            security: []
+            parameters: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PartCreate'
+    /service/find/all:
+        post:
+            operationId: AdminFindservice
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/Service'
+                                type: array
+            tags:
+                - service
+            security:
+                -
+                    jwt:
+                        - admin
+            parameters:
+                -
+                    description: 'the page that is returned'
+                    in: header
+                    name: page
+                    required: false
+                    schema:
+                        default: 1
+                        format: int32
+                        type: integer
+                -
+                    description: 'the number of records in the page'
+                    in: header
+                    name: count
+                    required: false
+                    schema:
+                        default: 10
+                        format: int32
+                        type: integer
+    /service/find:
+        post:
+            operationId: Findservices
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/Service'
+                                type: array
+            tags:
+                - service
+            security:
+                -
+                    jwt:
+                        - admin
+            parameters:
+                -
+                    description: 'page needs description'
+                    in: header
+                    name: page
+                    required: false
+                    schema:
+                        default: 0
+                        format: int32
+                        type: integer
+                -
+                    description: 'count needs description'
+                    in: header
+                    name: count
+                    required: false
+                    schema:
+                        default: 20
+                        format: int32
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                conditions:
+                                    additionalProperties: true
+                            required:
+                                - conditions
+                            type: object
+    '/service/{serviceId}':
+        get:
+            operationId: Getservice
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Service'
+            tags:
+                - service
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: serviceId
+                    required: true
+                    schema:
+                        type: string
+        put:
+            operationId: Updateservice
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Service'
+            tags:
+                - service
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: serviceId
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ServiceCreate'
+        delete:
+            operationId: Deleteservice
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                type: boolean
+            tags:
+                - service
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: serviceId
+                    required: true
+                    schema:
+                        type: string
+    /service:
+        post:
+            operationId: Createservice
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Service'
+            tags:
+                - service
+            security: []
+            parameters: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ServiceCreate'
+    /system/find/all:
+        post:
+            operationId: AdminFindsystem
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/System'
+                                type: array
+            tags:
+                - system
+            security:
+                -
+                    jwt:
+                        - admin
+            parameters:
+                -
+                    description: 'the page that is returned'
+                    in: header
+                    name: page
+                    required: false
+                    schema:
+                        default: 1
+                        format: int32
+                        type: integer
+                -
+                    description: 'the number of records in the page'
+                    in: header
+                    name: count
+                    required: false
+                    schema:
+                        default: 10
+                        format: int32
+                        type: integer
+    /system/find:
+        post:
+            operationId: Findsystems
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/System'
+                                type: array
+            tags:
+                - system
+            security:
+                -
+                    jwt:
+                        - admin
+            parameters:
+                -
+                    description: 'page needs description'
+                    in: header
+                    name: page
+                    required: false
+                    schema:
+                        default: 0
+                        format: int32
+                        type: integer
+                -
+                    description: 'count needs description'
+                    in: header
+                    name: count
+                    required: false
+                    schema:
+                        default: 20
+                        format: int32
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                conditions:
+                                    additionalProperties: true
+                            required:
+                                - conditions
+                            type: object
+    '/system/{systemId}':
+        get:
+            operationId: Getsystem
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/System'
+            tags:
+                - system
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: systemId
+                    required: true
+                    schema:
+                        type: string
+        put:
+            operationId: Updatesystem
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/System'
+            tags:
+                - system
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: systemId
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SystemCreate'
+        delete:
+            operationId: Deletesystem
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                type: boolean
+            tags:
+                - system
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: systemId
+                    required: true
+                    schema:
+                        type: string
+    /system:
+        post:
+            operationId: Createsystem
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/System'
+            tags:
+                - system
+            security: []
+            parameters: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SystemCreate'
+    /tool/find/all:
+        post:
+            operationId: AdminFindtool
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/Tool'
+                                type: array
+            tags:
+                - tool
+            security:
+                -
+                    jwt:
+                        - admin
+            parameters:
+                -
+                    description: 'the page that is returned'
+                    in: header
+                    name: page
+                    required: false
+                    schema:
+                        default: 1
+                        format: int32
+                        type: integer
+                -
+                    description: 'the number of records in the page'
+                    in: header
+                    name: count
+                    required: false
+                    schema:
+                        default: 10
+                        format: int32
+                        type: integer
+    /tool/find:
+        post:
+            operationId: Findtools
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/Tool'
+                                type: array
+            tags:
+                - tool
+            security:
+                -
+                    jwt:
+                        - admin
+            parameters:
+                -
+                    description: 'page needs description'
+                    in: header
+                    name: page
+                    required: false
+                    schema:
+                        default: 0
+                        format: int32
+                        type: integer
+                -
+                    description: 'count needs description'
+                    in: header
+                    name: count
+                    required: false
+                    schema:
+                        default: 20
+                        format: int32
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                conditions:
+                                    additionalProperties: true
+                            required:
+                                - conditions
+                            type: object
+    '/tool/{toolId}':
+        get:
+            operationId: Gettool
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Tool'
+            tags:
+                - tool
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: toolId
+                    required: true
+                    schema:
+                        type: string
+        put:
+            operationId: Updatetool
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Tool'
+            tags:
+                - tool
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: toolId
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ToolCreate'
+        delete:
+            operationId: Deletetool
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                type: boolean
+            tags:
+                - tool
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: toolId
+                    required: true
+                    schema:
+                        type: string
+    /tool:
+        post:
+            operationId: Createtool
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Tool'
+            tags:
+                - tool
+            security: []
+            parameters: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ToolCreate'
+    /user/find/all:
+        post:
+            operationId: AdminFinduser
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/User'
+                                type: array
+            tags:
+                - user
+            security:
+                -
+                    jwt:
+                        - admin
+            parameters:
+                -
+                    description: 'the page that is returned'
+                    in: header
+                    name: page
+                    required: false
+                    schema:
+                        default: 1
+                        format: int32
+                        type: integer
+                -
+                    description: 'the number of records in the page'
+                    in: header
+                    name: count
+                    required: false
+                    schema:
+                        default: 10
+                        format: int32
+                        type: integer
+    /user/find:
+        post:
+            operationId: Findusers
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/User'
+                                type: array
+            tags:
+                - user
+            security:
+                -
+                    jwt:
+                        - admin
+            parameters:
+                -
+                    description: 'page needs description'
+                    in: header
+                    name: page
+                    required: false
+                    schema:
+                        default: 0
+                        format: int32
+                        type: integer
+                -
+                    description: 'count needs description'
+                    in: header
+                    name: count
+                    required: false
+                    schema:
+                        default: 20
+                        format: int32
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                conditions:
+                                    additionalProperties: true
+                            required:
+                                - conditions
+                            type: object
+    '/user/{userId}':
+        get:
+            operationId: Getuser
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+            tags:
+                - user
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: userId
+                    required: true
+                    schema:
+                        type: string
+        put:
+            operationId: Updateuser
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+            tags:
+                - user
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: userId
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UserCreate'
+        delete:
+            operationId: Deleteuser
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                type: boolean
+            tags:
+                - user
+            security:
+                -
+                    jwt:
+                        - owner
+            parameters:
+                -
+                    in: path
+                    name: userId
+                    required: true
+                    schema:
+                        type: string
+    /user:
+        post:
+            operationId: Createuser
+            responses:
+                '200':
+                    description: Ok
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+            tags:
+                - user
+            security: []
+            parameters: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UserCreate'
+servers:
+    -
+        url: 'http://localhost:3002/v1'

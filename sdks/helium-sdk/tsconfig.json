@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "commonjs",
+    "target": "es5",
+    "lib": [
+      "es5",
+      "es6",
+      "es7",
+      "es2017",
+      "dom"
+    ],
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "rootDirs": [
+      "src",
+      ".storybook"
+    ],
+    "baseUrl": "./",
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": false,
+    "declaration": true,
+    "resolveJsonModule": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "./src/**/*",
+    "./types/**/*",
+    "./src/tests"
+  ],
+  "exclude": [
+    "node_modules",
+    ".vscode",
+    ".idea",
+    ".yaml",
+    "dist"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "tsoa": {
+      "signature": "02411e8a5ba52432e0e16c49bc00a7e8",
+      "pure": true
+    }
+  }
+}

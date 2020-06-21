@@ -1,0 +1,540 @@
+"use strict";
+import { UserDocument, User, userModel } from "../models/user-deprecate";
+import bcrypt from "bcrypt";
+import jsonwebtoken from "jsonwebtoken";
+import async from "async";
+import { entityModel, EntityDocument, Entity } from "../models/model-entity";
+// import { Model, Document } from "mongoose";
+// import { IApiToken } from "./automationApi";
+// import { EntityDocument } from "../models/model-entity";
+// const env = require("../env/environment");
+import emailer from "./email.t_s";
+import { Configurations } from "../utils/typings";
+import { findOne } from "../model-controllers/ctrl-universal";
+// const userController = require("../crudControllers/ctrl-users");
+// const entityController = require("../crudControllers/ctrl-entities");
+
+export function validateToken(token: string, jwtKey: string): string | object {
+  try {
+    return jsonwebtoken.verify(token, jwtKey);
+  } catch (error) {
+    throw new error("invalid token");
+  }
+}
+
+export function getUserFromToken(
+  token: string,
+  jwtKey: string
+): Promise<User> {
+  const decoded: any = jsonwebtoken.verify(token, jwtKey);
+
+  return new Promise<User>((resolve, reject) => {
+    findOne<UserDocument, User>(userModel, [{ email: decoded.email }]).then(
+      user => {
+        if (JSON.stringify(user._id) === JSON.stringify(decoded.id)) {
+          resolve(user);
+        } else {
+          reject("Invalid Session");
+        }
+      },
+      rejected => {
+        reject(rejected.toString());
+      }
+    );
+  });
+}
+
+export function generateNewToken(
+  token: string,
+  config: Pick<
+    Configurations,
+    "adminSessionDurationSeconds" | "jwtKey" | "userSessionDurationSeconds"
+  >
+): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    getUserFromToken(token, config.jwtKey).then(
+      user => {
+        const decoded: any = jsonwebtoken.verify(token, config.jwtKey);
+        if (JSON.stringify(user._id) === JSON.stringify(decoded.id)) {
+          const sessionStartDate = new Date(user.sessionStartDate);
+          const currentDate = new Date();
+          const timeDelta = currentDate.getTime() - sessionStartDate.getTime();
+          // standard users on a much larger session duration
+          let sessionDuration = config.userSessionDurationSeconds;
+          if (user.adminUser === true) {
+            sessionDuration = config.adminSessionDurationSeconds;
+          }
+          if (timeDelta / 1000 > sessionDuration) {
+            reject("session duratoin was exceeded");
+          } else {
+            const newToken = jsonwebtoken.sign(
+              { email: decoded.email, id: decoded.id },
+              config.jwtKey,
+              { expiresIn: sessionDuration }
+            );
+            resolve(newToken);
+          }
+        } else {
+          reject("Invalid Session");
+        }
+      },
+      rejected => {
+        reject(rejected.toString());
+      }
+    );
+  });
+}
+
+export function checkTokenService(
+  token: string,
+  config: Pick<Configurations, "jwtKey">
+): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    getUserFromToken(token, config.jwtKey).then(
+      () => {
+        resolve(true);
+      },
+      rejected => {
+        reject(rejected.toString());
+      }
+    );
+  });
+}
+
+function checkTokenAdmin(
+  token: string,
+  config: Pick<Configurations, "jwtKey">
+) {
+  return new Promise((resolve, reject) => {
+    getUserFromToken(token, config.jwtKey).then(
+      user => {
+        if (user.adminUser === true) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      },
+      rejected => {
+        reject(rejected.toString());
+      }
+    );
+  });
+}
+
+// export interface ApiCheckTokenValidRequest extends Omit<Request, "params"> {
+//   /* todo: fix this type hack*/
+//   clientData?: EntityDocument;
+//   params: {
+//     apiToken: string;
+//   };
+// }
+
+// export function checkTokenApi(
+//   req: ApiCheckTokenValidRequest,
+//   res: Response,
+//   next: any
+// ) {
+//   try {
+//     const decoded: any = jsonwebtoken.verify(
+//       req.params.apiToken,
+//       config.apiAccess.jwtSecret
+//     );
+//     if (typeof decoded !== "string") {
+//       const results: IApiToken = {
+//         apiKey: decoded.apiKey,
+//         apiToken: decoded.apiToken
+//       };
+//       modelEntity.findOne(
+//         {
+//           apiKey: results.apiKey,
+//           apiToken: results.apiToken
+//         },
+//         (err, entity) => {
+//           if (err) {
+//             res.status(400).send("your token is malformed");
+//           } else {
+//             if (entity.apiTokenExpiration > new Date(Date.now())) {
+//               req.clientData = entity;
+//               next();
+//             } else {
+//               res.status(500).send("based on my logic, this is an attack");
+//             }
+//           }
+//         }
+//       );
+//     } else {
+//       res.status(400).send("your token is malformed");
+//     }
+//   } catch (error) {
+//     res.status(400).send("token is invalid");
+//   }
+// }
+
+export function validateLoyaltyAccess(entity: Entity): boolean {
+  // because this was moved off the request, lets add it back
+  if (entity.loyaltyEnabled === true) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export function checkUserRightsOnEntity(
+  token: string,
+  entityId: string,
+  config: Pick<Configurations, "jwtKey">
+): Promise<Entity> {
+  return new Promise((resolve, reject) => {
+    try {
+      async.series<User | Entity, any>(
+        [
+          callback => {
+            // fetch the user from the token
+            getUserFromToken(token, config.jwtKey).then(
+              user => {
+                callback(null, user);
+              },
+              rejected => {
+                callback(rejected.toString());
+              }
+            );
+          },
+          callback => {
+            // fetch the entity from the entityId
+            findOne<EntityDocument, Entity>(entityModel, false, entityId).then(
+              entity => {
+                callback(null, entity);
+              },
+              rejected => {
+                callback(rejected.toString());
+              }
+            );
+          }
+        ],
+        // optional callback
+        (err, results) => {
+          // compare the entity to the users assigned entity
+          if (err) {
+            console.warn(
+              "An error occured when fetching from the DB in checkUserRightsOnEntity ",
+              JSON.stringify(err)
+            );
+            reject(
+              "An error occured when fetching from the DB in checkUserRightsOnEntity "
+            );
+          } else {
+            const user = results[0] as User;
+            const entity = results[1] as Entity;
+            if (
+              user.adminUser === true ||
+              ((typeof entity.adminUser === "object" ||
+                typeof entity.adminUser === "string") &&
+                entity.adminUser.toString() === user._id.toString())
+            ) {
+              resolve(entity);
+            } else {
+              console.warn(
+                "Unauthorized Access or error in checkUserRightsOnEntity",
+                JSON.stringify(err)
+              );
+              reject("Unauthorized Access or error in checkUserRightsOnEntity");
+            }
+          }
+        }
+      );
+    } catch (err) {
+      console.warn(
+        "Authenticate user on client likely failed a token validation ",
+        JSON.stringify(err)
+      );
+      reject("There wasn an unknown error on the server");
+    }
+  });
+}
+
+export function userSignUp(
+  emailApiKey: string,
+  userData: User & { accountType: "dispensary" | "producer" }
+): Promise<User> {
+  return new Promise((resolve, reject) => {
+    bcrypt.hash(userData.password, 10, (err, hash) => {
+      if (err) {
+        reject(err.toString());
+      } else {
+        findOne<UserDocument, User>(userModel, [{ email: userData.email }]).then(
+          user => {
+            if (!user) {
+              const dateTime = new Date();
+              const newUser = new userModel({
+                email: userData.email,
+                password: hash,
+                dispensaryUser: userData.accountType === "dispensary",
+                adminUser: false,
+                processorUser: userData.accountType === "producer",
+                sessionStartDate: dateTime
+              });
+              newUser.save((error, savedUser) => {
+                if (error) {
+                  reject(error.toString());
+                } else {
+                  emailer.sendUserSignupEmail(
+                    emailApiKey,
+                    savedUser.toObject()
+                  );
+                  emailer.signupAlert(emailApiKey, savedUser.toObject());
+                  resolve(savedUser.toObject());
+                }
+              });
+            } else {
+              reject("user already exsists");
+            }
+          },
+          rejected => {
+            reject(rejected.toString());
+          }
+        );
+      }
+    });
+  });
+}
+
+// export function userSignIn(): Promise<{token: string, user: User}> {
+//   userModel
+//     .findOne(
+//       { email: req.body.email },
+//       "+facebookProvider +twitterProvider +googleProvider +password"
+//     )
+//     .exec()
+//     .then(function(theUser) {
+//       if (theUser === null) {
+//         res.status(401).json({
+//           error: true,
+//           errorMessage: "Username or Password Wrong"
+//         });
+//       } else {
+//         bcrypt.compare(req.body.password, theUser.password, function(
+//           err,
+//           result
+//         ) {
+//           if (err) {
+//             res.status(401).json({
+//               error: true,
+//               errorMessage: "Username or Password Wrong"
+//             });
+//           } else if (result) {
+//             const jwtToken = jsonwebtoken.sign(
+//               {
+//                 email: theUser.email,
+//                 id: theUser._id
+//               },
+//               env.jwtKey,
+//               {
+//                 expiresIn: env.tokenExp
+//               }
+//             );
+//             const dateTime = new Date();
+//             const userUpdate = { sessionStartDate: dateTime };
+//             userModel.findByIdAndUpdate(
+//               { _id: theUser._id },
+//               userUpdate,
+//               { new: true },
+//               (updateErr, userUpdated) => {
+//                 if (updateErr) {
+//                   console.warn(updateErr);
+//                   res.status(500).json({
+//                     error: true,
+//                     errorMessage: "Username or Password Wrong" + updateErr
+//                   });
+//                 } else {
+//                   console.log("the user after updating sessionStartDate");
+//                   console.log(userUpdated);
+//                   // Remove unwanted fields
+//                   userUpdated = {
+//                     ...userUpdated,
+//                     googleProvider: undefined,
+//                     facebookProvider: undefined,
+//                     twitterProvider: undefined,
+//                     deletedDate: undefined
+//                   };
+//                   res.status(200).json({
+//                     success: "Welcome to the JWT Auth",
+//                     token: jwtToken,
+//                     user: userUpdated
+//                   });
+//                 }
+//               }
+//             );
+//           } else {
+//             res.status(401).json({
+//               error: true,
+//               errorMessage: "Username or Password Wrong"
+//             });
+//           }
+//         });
+//       }
+//     })
+//     .catch(error => {
+//       // console.warn(error)
+//       res.status(500).json({
+//         error
+//       });
+//     });
+// }
+
+// export function changePassword(req: Request, res: Response) {
+//   const decoded: any = jsonwebtoken.decode(req.params.token, env.jwtKey);
+//   userController.getByEmail(decoded.email, (user: UserDocument) => {
+//     if (JSON.stringify(user._id) === JSON.stringify(decoded.id)) {
+//       bcrypt.compare(req.body.password, user.password, function(err, result) {
+//         if (err) {
+//           res.status(401).json({
+//             error: true,
+//             errorMessage: "Wrong Password"
+//           });
+//         } else if (result) {
+//           if (req.body.passwordNew !== req.body.passwordVer) {
+//             res.status(401).json({
+//               error: true,
+//               errorMessage: "New passwords do not match"
+//             });
+//           }
+//           bcrypt.hash(req.body.passwordNew, 10, function(bcryptError, hash) {
+//             if (bcryptError) {
+//               res.status(500).json({
+//                 error: bcryptError
+//               });
+//             } else {
+//               user.password = hash;
+//               user.save(function(error, savedUser) {
+//                 if (error) {
+//                   res.status(500).json({
+//                     error
+//                   });
+//                 }
+//                 emailer.passwordHasChanged(savedUser);
+//                 res.status(200).json({
+//                   success: "Password has been changed",
+//                   user: savedUser
+//                 });
+//               });
+//             }
+//           });
+//         } else {
+//           res.status(401).json({
+//             error: true,
+//             errorMessage: "Wrong Password"
+//           });
+//         }
+//       });
+//     } else {
+//       res.status(400).send();
+//     }
+//   });
+// }
+
+// export function resetUserPassword(req: Request, res: Response) {
+//   const email = req.params.email;
+//   userController.getByEmail(email, (user: UserDocument) => {
+//     if (user === null) {
+//       res.status(200).json({
+//         success: "Password has been reset and is valid for 30 minutes"
+//       });
+//     } else {
+//       user.passwordResetHash = randomString(20);
+//       user.passwordResetExpires = new Date(new Date().getTime() + 30 * 60000);
+//       user.save(function(error, savedUser) {
+//         if (error) {
+//           res.status(500).json({
+//             error
+//           });
+//         } else {
+//           emailer.passwordReset(savedUser);
+//           res.status(200).json({
+//             success: "Password has been reset and is valid for 30 minutes"
+//           });
+//         }
+//       });
+//     }
+//   });
+// }
+
+// export function updateUserPassword(req: Request, res: Response) {
+//   // /:resetToken/:email"
+//   const email = req.body.email;
+//   const token = req.params.resetToken;
+//   userController.getByEmail(email, (user: UserDocument) => {
+//     if (user === null) {
+//       res.status(401).json({
+//         error: true,
+//         errorMessage: "Invalid request"
+//       });
+//     } else if (req.body.passwordNew !== req.body.passwordVer) {
+//       res.status(401).json({
+//         error: true,
+//         errorMessage: "New passwords do not match"
+//       });
+//     } else if (new Date() > user.passwordResetExpires) {
+//       res.status(401).json({
+//         error: true,
+//         errorMessage: "Reset token has expired"
+//       });
+//     } else if (token !== user.passwordResetHash) {
+//       res.status(401).json({
+//         error: true,
+//         errorMessage: "Invalid request"
+//       });
+//     } else {
+//       bcrypt.hash(req.body.passwordNew, 10, function(err, hash) {
+//         if (err) {
+//           res.status(500).json({
+//             error: err
+//           });
+//         } else {
+//           user.password = hash;
+//           user.save(function(error, savedUser) {
+//             if (error) {
+//               res.status(500).json({
+//                 error
+//               });
+//             } else {
+//               emailer.passwordHasChanged(savedUser);
+//               const jwtToken = jsonwebtoken.sign(
+//                 {
+//                   email: savedUser.email,
+//                   id: savedUser._id
+//                 },
+//                 env.jwtKey,
+//                 {
+//                   expiresIn: env.tokenExp
+//                 }
+//               );
+//               res.status(200).json({
+//                 success: "Password has been reset",
+//                 token: jwtToken,
+//                 user: savedUser
+//               });
+//             }
+//           });
+//         }
+//       });
+//     }
+//   });
+// }
+
+module.exports = {
+  validateToken,
+  userSignUp,
+  // userSignIn,
+  // validateAdmin,
+  //  adminValidator,
+  generateNewToken,
+  checkTokenAdmin,
+  // checkTokenApi,
+  checkUserRightsOnEntity,
+  checkTokenService,
+  // changePassword,
+  // updateUserPassword,
+  // resetUserPassword,
+  // randomString,
+  validateLoyaltyAccess
+};

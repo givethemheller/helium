@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Node Inspector",
+      "type": "node",
+      "request": "launch",
+      "args": [
+        "--project ${workspaceRoot}/apis/cbd-api/tsconfig.json",
+        "${workspaceRoot}/apis/cbd-api/src/server.ts"
+      ],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register",
+      ],
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector",
+      "internalConsoleOptions": "openOnSessionStart",
+      "env": {
+        "TS_NODE_IGNORE": "false"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest Cur CBD API",
+      "program": "${workspaceFolder}/apis/cbd-api/node_modules/.bin/jest",
+      "args": [
+        "${fileBasenameNoExtension}",
+        "--config",
+        "${workspaceFolder}/apis/cbd-api/jest.config.js"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      }
+    }
+  ]
+}

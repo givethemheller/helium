@@ -1,0 +1,314 @@
+import { User } from "../models/user-deprecate";
+import SendGrid from "@sendgrid/mail";
+import Request from "request";
+
+export interface CbdEmail {
+  from: string;
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+}
+function sendEmail(
+  apiKey: string,
+  message: CbdEmail
+): Promise<[Request.Response, {}]> {
+  return new Promise((resolve, reject) => {
+    SendGrid.setApiKey(apiKey);
+    SendGrid.send({
+      ...message
+    }).then(
+      fulfilled => {
+        resolve(fulfilled);
+      },
+      rejected => {
+        reject(rejected);
+      }
+    );
+  });
+}
+
+function emailTemplate(title: string, body: string, subscription = false) {
+  const subscriptionPiece =
+    subscription !== false
+      ? `<columns class="legal" small="12" large="6">
+  <p>This message is sent to you because your email address is on our subscribers list. If you are not interested in receiving more emails like this one, just hit <a target="_blank" href="#">Unsubscribe</a>.</p>
+</columns>`
+      : ``;
+
+  return (
+    `<html>
+    <head>
+    <style type="text/css">
+html {
+    background-color: #f7f7f7;
+    font-size: 15px;
+}
+.everything {
+    display: block;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0px 2px 1px 1px rgba(15,15,15,.1);
+    font-family: sans-serif;
+    background-color: #ffffff;
+    border-radius: 3px;
+}
+.everything a {
+    color: #FC0079;
+    text-decoration: none;
+}
+.everything p {
+    line-height: 1.3;
+    color: #696969;
+}
+.everything h1,
+.everything h2,
+.everything h3,
+.everything h4,
+.everything h5,
+.everything h6{
+    color: #00598B;
+}
+.header .columns {
+  padding-bottom: 0;
+}
+.header p {
+  color: #fff;
+  margin-bottom: 0;
+}
+.header .wrapper-inner {
+  padding: 20px; /*controls the height of the header*/
+}
+.header .container {
+  background: #FC0079;
+}
+.secondary {
+    border-top: 1px solid #0099F0;
+    display: block;
+}
+.secondary h5 {
+    margin-bottom: 2px;
+}
+.secondary p {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+.main-content {
+    display: block;
+    padding: 15px;
+}
+.content-area {
+    display: block;
+    margin-bottom: 24px;
+}
+menu.vertical {
+    padding-left: 0;
+}
+.legal {
+    display: block;
+    margin-top: 15px;
+    font-size: 11px;
+}
+p.lead{
+    color: #ED6BD3;
+    font-size: 18px;
+}
+</style>
+</head>
+<body>
+<div class="everything">
+    <div class="header" bgcolor="#8a8a8a">
+        <div>
+            <row class="collapse">
+                <columns small="6" valign="middle">
+                    <a href="https://cannabinder.com" target="_blank">
+                        <img src="https://cannabinder.com/assets/images/email--basic-header.png">
+                    </a>
+                </columns>
+            </row>
+        </div>
+    </div>
+    <div class="main-content">
+        <spacer size="16"></spacer>
+        <row class="content-area">
+            <columns>
+                <h1>` +
+    title +
+    `</h1>
+                ` +
+    body +
+    `
+                </columns>
+        </row>
+        <div class="secondary">
+            <spacer size="16"></spacer>
+            <row>
+                <columns small="12" large="6">
+                    <h5>Stalk Us</h5>
+                    <menu class="vertical">
+                        <a style="text-align: left;" target="_blank" href="http://twitter.com/cannabinder">Twitter</a>
+                        <a style="text-align: left;" target="_blank" href="http://facebook.com/cannabinder">Facebook</a>
+                    </menu>
+                </columns>
+                <columns small="12" large="6">
+                    <h5>Get In Touch</h5>
+                    <p><a href="mailto:team@cannabinder.com">team@cannabinder.com</a></p>
+                </columns>
+                ` +
+    subscriptionPiece +
+    `</row>
+                    </div>
+                </div>
+            </div></body></html>`
+  );
+}
+
+function sendUserSignupEmail(
+  apikey: string,
+  user: User
+): Promise<[Request.Response, {}]> {
+  const body = `<p>
+        Thank you for joining Cannabinder. You can start
+         using your account by adding products to your
+          <a href="https://cannabinder.com/binder">favorites</a>
+      </p>
+      <p>
+        By Tracking your favorite products, Cannabinder connects
+         you to repeatable experiences through the cannastamp.
+          Click on any favorite and we will show you products with the same
+          Cannastamp that will help you repeat your experience.
+      </p>`; // plain text body
+  const plainText = `By Tracking your favorite products, Cannabinder connects
+      you to repeatable experiences through the cannastamp.
+       Click on any favorite and we will show you products with the same
+       Cannastamp that will help you repeat your experience.
+    `;
+  const title = "Thank You For Joining Cannabinder";
+  const mailOptions = {
+    from: "service@cannabinder.com", // sender address
+    to: user.email, // list of receivers
+    subject: title, // Subject line
+    text: plainText,
+    html: emailTemplate(title, body, false)
+  };
+  return sendEmail(apikey, mailOptions);
+}
+
+function signupAlert(
+  apiKey: string,
+  user: User
+): Promise<[Request.Response, {}]> {
+  // sends an e-mail to the founders so they know someone signed up!
+  const body = "<p>Test: New User Signedup " + user.email + "</p>";
+  const plainText = "Test: New User Signedup " + user.email;
+  const title = "New User Signup: " + user.email;
+  const mailOptions = {
+    from: "service@cannabinder.com", // sender address
+    to: "tom@cannabinder.com,  lyle@cannabinder.com", // list of receivers
+    subject: title, // Subject line
+    text: plainText,
+    html: emailTemplate(title, body, false)
+  };
+  return sendEmail(apiKey, mailOptions);
+}
+
+function passwordHasChanged(
+  apiKey: string,
+  user: User
+): Promise<[Request.Response, {}]> {
+  // Lets user know their password was reset
+  const body =
+    "<p>Your password has been changed.</p><br><p>If this wasn't you, please contact our support @ freesupport@cannabinder.atlassian.net</p>";
+  const plainText =
+    "Your password has been changed. If this wasn't you, please contact our support.";
+  const title = "Your Password Has Been Changed";
+  const mailOptions = {
+    from: "service@cannabinder.com", // sender address
+    to: user.email, // list of receivers
+    subject: title, // Subject line
+    text: plainText,
+    html: emailTemplate(title, body, false)
+    // plain text body
+  };
+  return sendEmail(apiKey, mailOptions);
+}
+
+function passwordReset(
+  apiKey: string,
+  user: User,
+  configs: {
+    baseUrl: string;
+  }
+): Promise<[Request.Response, {}]> {
+  // Lets user know their password was reset
+  const body =
+    `<p>Your password has been changed.</p><br><p>If this
+  wasn't you, please contact our support @ freesupport@cannabinder.atlassian.net.</p><p> <a href="` +
+    configs.baseUrl +
+    `/resetpassword/` +
+    user.passwordResetHash +
+    `">click this link</a>
+   below to reset your password or copy and paste the following into
+   your browser ` +
+    configs.baseUrl +
+    `/resetpassword/` +
+    user.passwordResetHash;
+  const title = "Your Password Has Been Reset";
+  const plainText =
+    `Your password has been reset. Visit this URL to set a new password. ` +
+    configs.baseUrl +
+    `/resetpassword/` +
+    user.passwordResetHash +
+    ` If this wasn't you, please contact our support.`;
+  const mailOptions = {
+    from: "service@cannabinder.com", // sender address
+    to: user.email, // list of receivers
+    subject: title, // Subject line
+    text: plainText,
+    html: emailTemplate(title, body, false)
+  };
+  return sendEmail(apiKey, mailOptions);
+}
+
+function adminAttack(
+  clientUser: User,
+  clientToken: string,
+  resultsSearch: any,
+  apiKey: string
+): Promise<[Request.Response, {}]> {
+  const mailOptions = {
+    from: "tom@cannabinder.com", // sender address
+    to: "tom@cannabinder.com", // list of receivers
+    subject: "Its a trapppp, Admin is under attack", // Subject line
+    text:
+      "The server would appear to be under JWT token forgery attack " +
+      "Incomming Token " +
+      clientToken +
+      " " +
+      "Incomming Client User " +
+      clientUser.toString() +
+      " " +
+      "Server Search Results " +
+      resultsSearch.toString() +
+      " wtf, mate?",
+    html:
+      "<p>The server would appear to be under JWT token forgery attack</p>" +
+      "Incomming Token<br>" +
+      clientToken +
+      " <br>" +
+      "Incomming Client User<br>" +
+      clientUser +
+      " <br>" +
+      "Server Search Results<br>" +
+      resultsSearch +
+      "<br> wtf, mate?"
+  };
+  return sendEmail(apiKey, mailOptions);
+}
+export default {
+  signupAlert,
+  sendUserSignupEmail,
+  adminAttack,
+  passwordHasChanged,
+  passwordReset
+};

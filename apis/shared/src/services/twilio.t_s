@@ -1,0 +1,218 @@
+import {
+  userMessageModel,
+  UserMessageDocument
+} from "../models/model-userMessages";
+import { StandardCbdResponse, CbdError } from "../baseInterfaces";
+import { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
+import { EntityDocument } from "../models/model-entity";
+import { UserDocument } from "../models/user-deprecate";
+export interface MessageResponse extends StandardCbdResponse {
+  data?: MessageInstance;
+}
+const twilio = require("twilio");
+
+const sendTwilio = (
+  userMessage: UserMessageDocument,
+  mediaUrl: string[] | "",
+  body: string,
+  from: string,
+  to: number,
+  accountSid: string,
+  authToken: string,
+  cb: (response: MessageResponse) => void
+) => {
+  if (!accountSid || !authToken) {
+    const response: MessageResponse = {
+      data: null,
+      error: {
+        code: 400,
+        rawError: "twilio configuration not setup",
+        userMessage: "twilio configuration not setup"
+      }
+    };
+    cb(response);
+  } else {
+    const twiliClient = twilio(accountSid, authToken);
+    const messageData: {
+      userMessage: any;
+      body: any;
+      from: any;
+      to: any;
+      mediaUrl?: any;
+    } = {
+      userMessage,
+      body,
+      from,
+      to
+    };
+    if (mediaUrl !== "") {
+      messageData.mediaUrl = mediaUrl;
+    }
+    twiliClient.messages
+      .create(messageData)
+      .then((message: any) => {
+        const results: MessageResponse = {
+          data: message
+        };
+        // console.log(results);
+        cb(results);
+      })
+      .catch((rejectReason: any) => {
+        console.warn(rejectReason);
+        cb({ error: { code: 503, rawError: JSON.stringify(rejectReason) } });
+      });
+  }
+};
+
+export function getTwilioMessage(
+  messageId: string,
+  accountSid: string,
+  authToken: string,
+  cb: (response: MessageResponse) => void
+) {
+  if (!accountSid || !authToken) {
+    const response: MessageResponse = {
+      data: null,
+      error: {
+        code: 400,
+        rawError: "twilio configuration not setup",
+        userMessage: "twilio configuration not setup"
+      }
+    };
+    cb(response);
+  } else {
+    const twilioClient = twilio(accountSid, authToken);
+    twilioClient.messages.get(messageId).fetch((err: any, item: any) => {
+      if (err) {
+        cb({
+          error: {
+            code: 400,
+            rawError: err,
+            userMessage: "unable to fetch message data"
+          }
+        });
+      } else {
+        cb({ data: item });
+      }
+    });
+  }
+}
+
+export const retrieveMessageData = (limit = 1000) => {
+  userMessageModel.find({ "twilioData.status": "queued" })
+    .populate("client")
+    .limit(limit)
+    .exec((err, messages) => {
+      if (err) {
+        console.warn(err);
+      } else {
+        console.log("messages send and qued for update: " + messages.length);
+        messages.map(message => {
+          getTwilioMessage(
+            message.twilioData.sid,
+            message.client.twilioData.accountId,
+            message.client.twilioData.authToken,
+            updateData => {
+              if (updateData.error) {
+                console.warn(
+                  `error updating user message ${message._id} error: ${updateData.error}`
+                );
+              } else {
+                message.markModified("twilioData");
+                message.twilioData = {};
+                message.twilioData.accountSid = updateData.data.accountSid;
+                message.twilioData.apiVersion = updateData.data.apiVersion;
+                message.twilioData.body = updateData.data.body;
+                message.twilioData.dateCreated = updateData.data.dateCreated;
+                message.twilioData.dateSent = updateData.data.dateSent;
+                message.twilioData.dateUpdated = updateData.data.dateUpdated;
+                message.twilioData.direction = updateData.data.direction;
+                message.twilioData.errorCode = updateData.data.errorCode;
+                message.twilioData.errorMessage = updateData.data.errorMessage;
+                message.twilioData.from = updateData.data.from;
+                message.twilioData.messagingServiceSid =
+                  updateData.data.messagingServiceSid;
+                message.twilioData.numMedia = updateData.data.numMedia;
+                message.twilioData.numSegments = updateData.data.numSegments;
+                message.twilioData.price = updateData.data.price;
+                message.twilioData.priceUnit = updateData.data.priceUnit;
+                message.twilioData.sid = updateData.data.sid;
+                message.twilioData.status = updateData.data.status;
+                message.twilioData.subresourceUris =
+                  updateData.data.subresourceUris;
+                message.twilioData.to = updateData.data.to;
+                message.twilioData.uri = updateData.data.uri;
+                message.markModified("twilioData");
+                message.save(updateMessageError => {
+                  if (updateMessageError) {
+                    console.warn(
+                      `error updating user message  ${message._id} with twilio data error:${updateMessageError}`
+                    );
+                  } else {
+                    console.log(
+                      `updated message ${message._id}  with data from twilio`
+                    );
+                  }
+                });
+              }
+            }
+          );
+        });
+      }
+    });
+};
+
+export const sendQuedMessages = (limit = 1000) => {
+  userMessageModel.find({ sendDate: { $lt: new Date() }, messageSent: false })
+    .limit(limit)
+    .exec((err, messages) => {
+      // console.log(err);
+      console.log("messages pending to send: " + messages.length);
+      if (err) {
+        console.warn(err);
+      } else {
+        messages.map(message => {
+          message.save((saveErr, results) => {
+            if (saveErr) {
+              console.warn(saveErr);
+            } else {
+              console.warn(results);
+            }
+          });
+        });
+      }
+    });
+};
+
+export const twilioMessageSender = (
+  message: UserMessageDocument,
+  clientDoc: EntityDocument,
+  userDoc: UserDocument,
+  cb: (err?: CbdError, twilioData?: UserMessageDocument["twilioData"]) => void
+) => {
+  sendTwilio(
+    message,
+    message.method === "mms" ? message.messageMediaAws : "",
+    message.messageBody,
+    clientDoc.twilioData.phoneNumber,
+    userDoc.phone,
+    clientDoc.twilioData.accountId,
+    clientDoc.twilioData.authToken,
+    theResponse => {
+      if (theResponse.error) {
+        console.warn(theResponse);
+        cb(
+          {
+            code: 500,
+            userMessage: "twilio failed to send the message",
+            rawError: theResponse.error
+          },
+          null
+        );
+      } else {
+        const { data } = theResponse;
+        cb(null, data);
+      }
+    }
+  );
+};
