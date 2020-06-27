@@ -30,8 +30,7 @@
       "**/babel-jest",
       "typescript",
       "**/typescript/**",
-      "**/typescript",
-      "**react-native**"
+      "**/typescript"
     ]
   }
 }

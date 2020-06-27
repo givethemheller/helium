@@ -1,0 +1,35 @@
+{
+  "name": "helium-rmw",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "cra-template": "1.0.3",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "rmw-react-scripts": "4.0.8"
+  },
+  "scripts": {
+    "check": "npm-check -s -u",
+    "analyze": "source-map-explorer build/static/js/main.*",
+    "start": "react-scripts start",
+    "standard": "standard src/**/*.js",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
